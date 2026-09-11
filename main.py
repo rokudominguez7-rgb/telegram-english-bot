@@ -1,14 +1,13 @@
 import os
 import telebot
-import google.generativeai as genai
+from g4f.client import Client
 
-# 1. CONFIGURACIÓN DE LLAVES (Coloca tus llaves reales aquí dentro)
+# 1. CONFIGURACIÓN DE TELEGRAM (Coloca tu token real de BotFather aquí dentro)
 TELEGRAM_TOKEN = "8939512104:AAHl2lZI6_tS8dJPANtCaDHA7eSamOxor1Y"
-GEMINI_API_KEY = "AQ.Ab8RN6KwATPjhhe47ltci5Qhryai-wa4qbrPM5RE-YeUguRDkg"
 
-# 2. INICIALIZACIÓN COMPATIBLE
+# 2. INICIALIZACIÓN
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
-genai.configure(api_key=GEMINI_API_KEY)
+ai_client = Client()
 
 # 3. CONTENIDO DEL LIBRO
 TEXTO_LECCION = """
@@ -62,38 +61,48 @@ REGLAS OBLIGATORIAS:
 4. Si el usuario comete un error al responder, corrígelo amablemente antes de continuar el diálogo.
 """
 
-# Configuración del modelo clásico
-model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash",
-    system_instruction=SYSTEM_PROMPT
-)
+# Historial de mensajes para que la IA recuerde la conversación
+user_histories = {}
 
-user_chats = {}
-
-def get_or_create_chat(user_id):
-    if user_id not in user_chats:
-        user_chats[user_id] = model.start_chat(history=[])
-    return user_chats[user_id]
+def get_ai_response(user_id, user_message):
+    if user_id not in user_histories:
+        user_histories[user_id] = [{"role": "system", "content": SYSTEM_PROMPT}]
+    
+    user_histories[user_id].append({"role": "user", "content": user_message})
+    
+    # Llamada al proveedor libre de Inteligencia Artificial
+    response = ai_client.chat.completions.create(
+        model="gpt-4o",
+        messages=user_histories[user_id]
+    )
+    
+    ai_text = response.choices[0].message.content
+    user_histories[user_id].append({"role": "assistant", "content": ai_text})
+    return ai_text
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     user_id = message.from_user.id
-    if user_id in user_chats:
-        del user_chats[user_id]
-    chat = get_or_create_chat(user_id)
-    ai_response = chat.send_message("Hola, inicia el diálogo interactivo de la lección desde el principio.")
-    bot.reply_to(message, ai_response.text)
+    if user_id in user_histories:
+        del user_histories[user_id]
+    
+    bot.send_chat_action(message.chat.id, 'typing')
+    try:
+        reply = get_ai_response(user_id, "Hola, inicia el diálogo interactivo de la lección desde el principio.")
+        bot.reply_to(message, reply)
+    except Exception as e:
+        bot.reply_to(message, "Iniciando tutor... Por favor envía /start nuevamente en 5 segundos.")
+        print(f"Error: {e}")
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
     user_id = message.from_user.id
-    chat = get_or_create_chat(user_id)
     bot.send_chat_action(message.chat.id, 'typing')
     try:
-        ai_response = chat.send_message(message.text)
-        bot.reply_to(message, ai_response.text)
+        reply = get_ai_response(user_id, message.text)
+        bot.reply_to(message, reply)
     except Exception as e:
-        bot.reply_to(message, f"¡Disculpa! Tuve un pequeño parpadeo de conexión. ¿Podrías repetir tu último mensaje?")
+        bot.reply_to(message, "Tuve un pequeño problema al procesar el mensaje. ¿Podrías repetirlo?")
         print(f"Error: {e}")
 
 # Servidor web para Render Free
