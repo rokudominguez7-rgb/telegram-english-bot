@@ -1,19 +1,16 @@
 import os
 import telebot
-from google import genai
-from google.genai import types
+import google.generativeai as genai
 
-# 1. CONFIGURACIÓN DE LLAVES (Mantén tus claves reales aquí dentro)
+# 1. CONFIGURACIÓN DE LLAVES (Coloca tus llaves reales aquí dentro)
 TELEGRAM_TOKEN = "8939512104:AAHl2lZI6_tS8dJPANtCaDHA7eSamOxor1Y"
 GEMINI_API_KEY = "AQ.Ab8RN6KwATPjhhe47ltci5Qhryai-wa4qbrPM5RE-YeUguRDkg"
 
-# 2. INICIALIZACIÓN
+# 2. INICIALIZACIÓN COMPATIBLE
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
-ai_client = genai.Client(api_key=GEMINI_API_KEY)
+genai.configure(api_key=GEMINI_API_KEY)
 
-user_chats = {}
-
-# 3. CONTENIDO DEL LIBRO (Pega aquí el texto que copiaste de tu Lección 3)
+# 3. CONTENIDO DEL LIBRO
 TEXTO_LECCION = """
 Lección 3. LAS PRIMERAS PALABRAS
 Es momento de aprender las palabras, frases y expresiones más frecuentes usadas en el inglés. Las cuales te ayudarán a expresarte cotidianamente.
@@ -65,16 +62,17 @@ REGLAS OBLIGATORIAS:
 4. Si el usuario comete un error al responder, corrígelo amablemente antes de continuar el diálogo.
 """
 
+# Configuración del modelo clásico
+model = genai.GenerativeModel(
+    model_name="gemini-1.5-flash",
+    system_instruction=SYSTEM_PROMPT
+)
+
+user_chats = {}
+
 def get_or_create_chat(user_id):
     if user_id not in user_chats:
-        chat = ai_client.chats.create(
-            model="gemini-2.5-flash",
-            config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_PROMPT,
-                temperature=0.7,
-            )
-        )
-        user_chats[user_id] = chat
+        user_chats[user_id] = model.start_chat(history=[])
     return user_chats[user_id]
 
 @bot.message_handler(commands=['start'])
@@ -95,10 +93,10 @@ def handle_message(message):
         ai_response = chat.send_message(message.text)
         bot.reply_to(message, ai_response.text)
     except Exception as e:
-        bot.reply_to(message, "¡Disculpa! Tuve un pequeño parpadeo de conexión. ¿Podrías repetir tu último mensaje?")
+        bot.reply_to(message, f"¡Disculpa! Tuve un pequeño parpadeo de conexión. ¿Podrías repetir tu último mensaje?")
         print(f"Error: {e}")
 
-# Servidor web ultra-simple para mantener feliz a Render Free
+# Servidor web para Render Free
 if __name__ == "__main__":
     from threading import Thread
     from http.server import HTTPServer, BaseHTTPRequestHandler
