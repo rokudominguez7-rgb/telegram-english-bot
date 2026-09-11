@@ -15,7 +15,42 @@ user_chats = {}
 
 # 3. CONTENIDO DEL LIBRO (Pega aquí el texto que copiaste de tu Lección 3)
 TEXTO_LECCION = """
-[PEGA AQUÍ TODO EL TEXTO DE LA LECCIÓN 3 QUE COPIASTE DE TU LIBRO]
+Lección 3. LAS PRIMERAS PALABRAS
+Es momento de aprender las palabras, frases y expresiones más frecuentes usadas en el inglés. Las cuales te ayudarán a expresarte cotidianamente.
+
+ESPAÑOL | INGLÉS | PRONUNCIACIÓN
+sí | yes | iés
+no | no | no
+quizás | maybe | méibi
+yo soy (estoy) | I am | ái em
+yo tengo | I have | ái jav
+es (está) | It is | it is
+nada | nothing | názing
+todo | everything | évrizing
+nunca | never | nevár
+siempre | always | ólueis
+quiero | I want | ái uónt
+no quiero | I don't want | ái don't uónt
+me gustaría | I would like | ái úud like
+aquí | here | jiar
+allá | there | zéar
+hoy | today | tudéi
+ayer | yesterday | iésterdei
+mañana | tomorrow | tumórrou
+pasado mañana | the day after tomorrow | zé déi áftar tumórrou
+bueno | good | gúud
+esto aquí | this one | dis uán
+ese allá | that one | dat uán
+un momento | just a second | chyast e sécond
+antes | before | bifóar
+después | after | áftár
+a menudo | often | óften
+raras veces | seldom | séldom
+una vez | once | uáns
+muchas veces | many times | méni táims
+otra vez | again | eguéin
+con | with | uiz
+sin | without | uizáut
 """
 
 SYSTEM_PROMPT = f"""
