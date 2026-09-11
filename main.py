@@ -4,8 +4,8 @@ from google import genai
 from google.genai import types
 
 # 1. CONFIGURACIÓN DE LLAVES (Reemplaza con tus datos reales)
-TELEGRAM_TOKEN = "TU_TOKEN_DE_TELEGRAM_AQUÍ"
-GEMINI_API_KEY = "TU_API_KEY_DE_GEMINI_AQUÍ"
+TELEGRAM_TOKEN = "8939512104:AAHl2lZI6_tS8dJPANtCaDHA7eSamOxor1Y"
+GEMINI_API_KEY = "AQ.Ab8RN6KwATPjhhe47ltci5Qhryai-wa4qbrPM5RE-YeUguRDkg"
 
 # 2. INICIALIZACIÓN DE CLIENTES
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
